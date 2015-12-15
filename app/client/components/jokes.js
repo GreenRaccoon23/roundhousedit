@@ -26,7 +26,7 @@ var jokes = {
     window.categoryList = ['all'];
     window.jokeList = [];
     ctrl.category = window.category;
-    ctrl.jokes = [];
+    // ctrl.jokes = [];
     ctrl.jokes = [{
       categories: [],
       id: 2,
@@ -64,7 +64,6 @@ var jokes = {
         .then(function(response) {
           console.log('Received response');
           // console.log('response', response);
-          // ctrl.jokes = _.shuffle(response.value);
           ctrl.filterResponse(response);
         });
     };
@@ -73,7 +72,6 @@ var jokes = {
       api.fetchCategory(ctrl.category)
         .then(function(response) {
           // console.log('response', response);
-          // ctrl.jokes = _.shuffle(response.value);
           ctrl.filterResponse(response);
         });
     };
@@ -85,16 +83,17 @@ var jokes = {
         }, false)
         if (!skip) {
           joke.votes = joke.votes || 0;
+          joke.favorite = joke.favorite || false;
+          joke.vote = joke.vote || '';
           joke.joke = joke.joke.replace(/\&quot\;/g, '"');
+
           ctrl.jokes.push(joke);
         }
       })
       console.log('Filtered response');
-      // console.log('ctrl.jokes before:', ctrl.jokes);
       ctrl.sortJokes();
       window.jokeList = ctrl.jokes;
       console.log('Sorted response');
-      // console.log('ctrl.jokes after:', ctrl.jokes);
     };
 
     ctrl.sortJokesOld = function() {
@@ -111,9 +110,7 @@ var jokes = {
           m.redraw('diff');
         }
       }
-      // setTimeout(ctrl.sortJokes.bind(ctrl, i + 1), 100);
       setTimeout(ctrl.sortJokes, 1);
-      // ctrl.sortJokes(i + 1);
     };
 
     ctrl.sortJokes = function() {
@@ -153,22 +150,22 @@ var jokes = {
     ctrl.watchingCategory = setInterval(ctrl.watchCategory, 500);
   },
   view: function(ctrl) {
-    return m('#jokes', window.jokeList.map(function(jokeObj) {
-      // console.log('jokeObj', jokeObj);
-      // return m.component(joke, { ctrl: ctrl, jokeObj: jokeObj })
-      // return m.component(joke, { jokeObj: jokeObj })
-      var correctCategory = (jokeObj.categories.indexOf(window.category) !== -1);
-      return (window.category === 'all' || correctCategory)
-        ? m.component(joke, { jokeObj: jokeObj })
-        : ''
-    }));
+    return m('#jokes-container',
+      m('#jokes',
+        window.jokeList.map(function(jokeObj) {
+          var correctCategory = (jokeObj.categories.indexOf(window.category) !== -1);
+          return (window.category === 'all' || correctCategory)
+            ? m.component(joke, { jokeObj: jokeObj })
+            : ''
+        })
+      )
+    );
   }
 }
 
 var joke = {
   controller: function(inherited) {
     var ctrl = this;
-    // ctrl.parent = inherited.ctrl;
     ctrl.jokeObj = inherited.jokeObj;
     ctrl.favorite = m.prop(false);
   },
@@ -177,14 +174,14 @@ var joke = {
         class: ctrl.favorite() ? 'favorite' : ''
       }, [
         m('.thumb-container', [
-          m.component(thumbUpIcon, ctrl),
-          m.component(thumbDownIcon, ctrl),
+          m.component(thumbUpIcon, ctrl.jokeObj),
+          m.component(thumbDownIcon, ctrl.jokeObj),
           m('.joke-vote', ctrl.jokeObj.votes)
         ]),
         m('.joke-text-container', [
           m('.joke-text', ctrl.jokeObj.joke)
         ]),
-        m.component(starIcon, { favorite: ctrl.favorite } )
+        m.component(starIcon, ctrl.jokeObj)
       ]
     );
   }
@@ -193,16 +190,17 @@ var joke = {
 var thumbUpIcon = {
   controller: function(inherited) {
     var ctrl = this;
-    // ctrl.inherited = inherited;
-    ctrl.jokeObj = inherited.jokeObj;
+    ctrl.jokeObj = inherited;
   },
   view: function(ctrl) {
-    // console.log('Rendering thumbUpIcon');
     return m('.thumbUp', {
+        class: (ctrl.jokeObj.vote === 'up') ? 'voted-up' : '',
         onclick: function(e) {
+          if (ctrl.jokeObj.vote !== '') {
+            return;
+          }
           ctrl.jokeObj.votes += 1;
-          m.redraw(true);
-          // console.log('ctrl.jokes.votes', ctrl.jokes.votes);
+          ctrl.jokeObj.vote = 'up';
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path', {
@@ -216,14 +214,17 @@ var thumbUpIcon = {
 var thumbDownIcon = {
   controller: function(inherited) {
     var ctrl = this;
-    // ctrl.inherited = inherited;
-    ctrl.jokeObj = inherited.jokeObj;
+    ctrl.jokeObj = inherited;
   },
   view: function(ctrl) {
     return m('.thumbDown', {
+        class: (ctrl.jokeObj.vote === 'down') ? 'voted-down' : '',
         onclick: function(e) {
+          if (ctrl.jokeObj.vote !== '') {
+            return;
+          }
           ctrl.jokeObj.votes -= 1;
-          m.redraw(true);
+          ctrl.jokeObj.vote = 'down';
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path', {
@@ -237,16 +238,16 @@ var thumbDownIcon = {
 var starIcon = {
   controller: function(inherited) {
     var ctrl = this;
-    ctrl.favorite = inherited.favorite;
+    ctrl.jokeObj = inherited;
   },
   view: function(ctrl) {
     return m('.star', {
-        class: ( ctrl.favorite() ) ? 'starred' : 'unstarred',
+        class: (ctrl.jokeObj.favorite) ? 'starred' : 'unstarred',
         onclick: function(e) {
-          if (ctrl.favorite()) {
-            ctrl.favorite(false);
+          if (ctrl.jokeObj.favorite) {
+            ctrl.jokeObj.favorite = false;
           } else {
-            ctrl.favorite(true);
+            ctrl.jokeObj.favorite = true;
           }
         }
       }, m('svg[viewBox="0 0 24 24"]', [
