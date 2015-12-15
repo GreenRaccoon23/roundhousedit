@@ -1,17 +1,3 @@
-Array.prototype.matches = function(other) {
-  if (this.length !== other.length) {
-    return false;
-  }
-  for (var i = 0, len = this.length; i < len; i++) {
-    if (Array.isArray(this[i]) && !this[i].matches(other[i])) {
-      return false;
-    } else if (this[i] !== other[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
 var bar = {
   controller: function() {
     var ctrl = this;
@@ -54,12 +40,12 @@ var categories = {
 }
 
 function expandedCategories() {
-  return m('.menu', 'Categories',
+  return m('#categories', 'Categories',
     window.categoryList.map(function(c) {
       return m('.category', {
-        class: c.category,
+        class: c,
         onclick: function() {
-          window.category = c.category;
+          window.category = c;
         }
       }, c);
     })
@@ -67,7 +53,7 @@ function expandedCategories() {
 }
 
 function collapsedCategories() {
-  return m('.menu', 'Categories', []);
+  return m('#categories', 'Categories', []);
 }
 
 // function menuElements(ctrl) {

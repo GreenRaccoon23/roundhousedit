@@ -3,9 +3,16 @@ Array.prototype.matches = function(other) {
     return false;
   }
   for (var i = 0, len = this.length; i < len; i++) {
+    if (Array.isArray(this[i])) {
+      console.log('Going down');
+    }
+
     if (Array.isArray(this[i]) && !this[i].matches(other[i])) {
       return false;
     } else if (this[i] !== other[i]) {
+      // console.log('false');
+      console.log('this[i]', this[i]);
+      console.log('other[i]', other[i]);
       return false;
     }
   }
@@ -16,9 +23,10 @@ var jokes = {
   controller: function() {
     var ctrl = this;
     window.category = 'all';
-    window.categoryList = [];
+    window.categoryList = ['all'];
+    window.jokeList = [];
     ctrl.category = window.category;
-    // ctrl.jokes = [];
+    ctrl.jokes = [];
     ctrl.jokes = [{
       categories: [],
       id: 2,
@@ -37,8 +45,9 @@ var jokes = {
         .then(function(response) {
           // console.log('response', response);
           ctrl.categories = response.value;
-          window.categoryList = _.extend(window.categoryList, response.value);
-          // console.log('response.value for categories', window.categoryList);
+          console.log('categoryList', window.categoryList);
+          window.categoryList = window.categoryList.concat(response.value);
+          console.log('categoryList', window.categoryList);
         });
     };
 
@@ -88,21 +97,45 @@ var jokes = {
       // console.log('ctrl.jokes after:', ctrl.jokes);
     };
 
-    ctrl.sortJokes = function() {
-      var sorted = [];
-      var added = {};
-
-      var sorted = ctrl.jokes.sort(function(first, second) {
-        return second.votes - first.votes;
-      })
-      if (!ctrl.jokes.matches(sorted)) {
-        ctrl.jokes = sorted;
-        window.jokeList = ctrl.jokes;
+    ctrl.sortJokesOld = function() {
+      for (var i = 0, len = ctrl.jokes.length - 1; i < len; i++) {
+        var currJoke = ctrl.jokes[i];
+        var nextJoke = ctrl.jokes[i + 1];
+        if (nextJoke.votes > currJoke.votes) {
+          for (var p in currJoke) {
+            var currP = currJoke[p];
+            var nextP = nextJoke[p];
+            currJoke[p] = nextP;
+            nextJoke[p] = currP;
+          }
+          m.redraw('diff');
+        }
       }
-      setTimeout(ctrl.sortJokes, 100);
-    }
+      // setTimeout(ctrl.sortJokes.bind(ctrl, i + 1), 100);
+      setTimeout(ctrl.sortJokes, 1);
+      // ctrl.sortJokes(i + 1);
+    };
 
-    ctrl.watch = function() {
+    ctrl.sortJokes = function() {
+      for (var i = 0, len = ctrl.jokes.length - 1; i < len; i++) {
+        var currJoke = ctrl.jokes[i];
+        for (var j = i + 1; j < len; j++) {
+          var nextJoke = ctrl.jokes[j];
+          if (nextJoke.votes > currJoke.votes) {
+            for (var p in currJoke) {
+              var currP = currJoke[p];
+              var nextP = nextJoke[p];
+              currJoke[p] = nextP;
+              nextJoke[p] = currP;
+            }
+            m.redraw('diff');
+          }
+        }
+      }
+      setTimeout(ctrl.sortJokes, 1);
+    };
+
+    ctrl.watchCategory = function() {
       if (window.category !== ctrl.category) {
         ctrl.category = window.category;
         if (ctrl.category !== 'all') {
@@ -117,16 +150,17 @@ var jokes = {
     ctrl.fetchTotal();
     ctrl.fetchAll();
 
-    ctrl.watchingCategory = setInterval(ctrl.watch, 500);
-    // ctrl.watchingVotes = setInterval(ctrl.sortJokes, 500);
-    // setInterval(function() {
-    //   if (window.jokeList.length) console.log(window.jokeList[0]);
-    // }, 1000)
+    ctrl.watchingCategory = setInterval(ctrl.watchCategory, 500);
   },
   view: function(ctrl) {
     return m('#jokes', window.jokeList.map(function(jokeObj) {
       // console.log('jokeObj', jokeObj);
-      return m.component(joke, jokeObj)
+      // return m.component(joke, { ctrl: ctrl, jokeObj: jokeObj })
+      // return m.component(joke, { jokeObj: jokeObj })
+      var correctCategory = (jokeObj.categories.indexOf(window.category) !== -1);
+      return (window.category === 'all' || correctCategory)
+        ? m.component(joke, { jokeObj: jokeObj })
+        : ''
     }));
   }
 }
@@ -134,7 +168,8 @@ var jokes = {
 var joke = {
   controller: function(inherited) {
     var ctrl = this;
-    ctrl.jokeObj = inherited;
+    // ctrl.parent = inherited.ctrl;
+    ctrl.jokeObj = inherited.jokeObj;
     ctrl.favorite = m.prop(false);
   },
   view: function(ctrl) {
@@ -142,8 +177,8 @@ var joke = {
         class: ctrl.favorite() ? 'favorite' : ''
       }, [
         m('.thumb-container', [
-          m.component(thumbUpIcon, ctrl.jokeObj),
-          m.component(thumbDownIcon, ctrl.jokeObj),
+          m.component(thumbUpIcon, ctrl),
+          m.component(thumbDownIcon, ctrl),
           m('.joke-vote', ctrl.jokeObj.votes)
         ]),
         m('.joke-text-container', [
@@ -152,6 +187,50 @@ var joke = {
         m.component(starIcon, { favorite: ctrl.favorite } )
       ]
     );
+  }
+}
+
+var thumbUpIcon = {
+  controller: function(inherited) {
+    var ctrl = this;
+    // ctrl.inherited = inherited;
+    ctrl.jokeObj = inherited.jokeObj;
+  },
+  view: function(ctrl) {
+    // console.log('Rendering thumbUpIcon');
+    return m('.thumbUp', {
+        onclick: function(e) {
+          ctrl.jokeObj.votes += 1;
+          m.redraw(true);
+          // console.log('ctrl.jokes.votes', ctrl.jokes.votes);
+        }
+      }, m('svg[viewBox="0 0 48 48"]', [
+          m('path', {
+            d: 'M2 42h8V18H2v24zm44-22c0-2.21-1.79-4-4-4H29.37l1.91-9.14c.04-.2.07-.41.07-.63 0-.83-.34-1.58-.88-2.12L28.34 2 15.17 15.17C14.45 15.9 14 16.9 14 18v20c0 2.21 1.79 4 4 4h18c1.66 0 3.08-1.01 3.68-2.44l6.03-14.1c.18-.46.29-.95.29-1.46v-3.83l-.02-.02L46 20z'
+          })
+        ])
+      );
+  }
+}
+
+var thumbDownIcon = {
+  controller: function(inherited) {
+    var ctrl = this;
+    // ctrl.inherited = inherited;
+    ctrl.jokeObj = inherited.jokeObj;
+  },
+  view: function(ctrl) {
+    return m('.thumbDown', {
+        onclick: function(e) {
+          ctrl.jokeObj.votes -= 1;
+          m.redraw(true);
+        }
+      }, m('svg[viewBox="0 0 48 48"]', [
+          m('path', {
+            d: 'M30 6H12c-1.66 0-3.08 1.01-3.68 2.44l-6.03 14.1C2.11 23 2 23.49 2 24v3.83l.02.02L2 28c0 2.21 1.79 4 4 4h12.63l-1.91 9.14c-.04.2-.07.41-.07.63 0 .83.34 1.58.88 2.12L19.66 46l13.17-13.17C33.55 32.1 34 31.1 34 30V10c0-2.21-1.79-4-4-4zm8 0v24h8V6h-8z'
+          })
+        ])
+      );
   }
 }
 
@@ -173,46 +252,6 @@ var starIcon = {
       }, m('svg[viewBox="0 0 24 24"]', [
           m('path', {
             d: 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'
-          })
-        ])
-      );
-  }
-}
-
-var thumbUpIcon = {
-  controller: function(inherited) {
-    var ctrl = this;
-    ctrl.jokeObj = inherited;
-  },
-  view: function(ctrl) {
-    // console.log('Rendering thumbUpIcon');
-    return m('.thumbUp', {
-        onclick: function(e) {
-          ctrl.jokeObj.votes += 1;
-          // console.log('ctrl.jokeObj.votes', ctrl.jokeObj.votes);
-        }
-      }, m('svg[viewBox="0 0 48 48"]', [
-          m('path', {
-            d: 'M2 42h8V18H2v24zm44-22c0-2.21-1.79-4-4-4H29.37l1.91-9.14c.04-.2.07-.41.07-.63 0-.83-.34-1.58-.88-2.12L28.34 2 15.17 15.17C14.45 15.9 14 16.9 14 18v20c0 2.21 1.79 4 4 4h18c1.66 0 3.08-1.01 3.68-2.44l6.03-14.1c.18-.46.29-.95.29-1.46v-3.83l-.02-.02L46 20z'
-          })
-        ])
-      );
-  }
-}
-
-var thumbDownIcon = {
-  controller: function(inherited) {
-    var ctrl = this;
-    ctrl.jokeObj = inherited;
-  },
-  view: function(ctrl) {
-    return m('.thumbDown', {
-        onclick: function(e) {
-          ctrl.jokeObj.votes -= 1;
-        }
-      }, m('svg[viewBox="0 0 48 48"]', [
-          m('path', {
-            d: 'M30 6H12c-1.66 0-3.08 1.01-3.68 2.44l-6.03 14.1C2.11 23 2 23.49 2 24v3.83l.02.02L2 28c0 2.21 1.79 4 4 4h12.63l-1.91 9.14c-.04.2-.07.41-.07.63 0 .83.34 1.58.88 2.12L19.66 46l13.17-13.17C33.55 32.1 34 31.1 34 30V10c0-2.21-1.79-4-4-4zm8 0v24h8V6h-8z'
           })
         ])
       );
