@@ -34,7 +34,40 @@ html, body {
 
   font-size: 1.25rem;
   margin: 0;
-  padding: .5em;
+  padding: 1em;
+  padding-bottom: 0;
+}
+
+#menu {
+  width: 5em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+#categories {
+  background: #795548;
+  margin-bottom: 1em;
+  padding-bottom: 0;
+  font-weight: bold;
+}
+
+.category {
+  /*background: #8D6E63;*/
+  text-indent: .5em;
+  font-weight: normal;
+  margin-bottom: 1em;
+  padding-bottom: 0;
+}
+
+.category:first-child {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.category:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  /*background: #F00;*/
 }
 
 .bar {
@@ -53,7 +86,7 @@ html, body {
   background: #F5F5F5;
   width: 100%;
   margin: 0;
-  margin-top: 2.25rem;
+  margin-top: 3.5rem;
   padding: 0;
 }
 
