@@ -1,0 +1,116 @@
+/*Block Level Elements*/
+html, body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  font-family: Roboto;
+  background: #E9E9E9;
+  color: #FAFAFA;
+  font-size: 16px;
+  text-indent: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/*Selectors.. Classes/IDs*/
+#container {
+  display: block;
+  background: #F5F5F5;
+  height: 100%;
+  width: 80%;
+  margin: 1em;
+  margin-top: 0;
+  padding: .5em 1em .5em 1em;
+}
+
+#bar {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  display: block;
+  background: #795548;
+  width: 100%;
+
+  font-size: 1.25rem;
+  margin: 0;
+  padding: .5em;
+}
+
+.bar {
+  display: block;
+  background: #FF5722;
+  color: #FAFAFA;
+  padding: .25em;
+  border: 1px solid #FF5722;
+  border-radius: 4px;
+  box-shadow: 1px 1px 5px #FF5722;
+}
+
+#jokes {
+  display: inline-block;
+  position: relative;
+  background: #F5F5F5;
+  width: 100%;
+  margin: 0;
+  margin-top: 2.25rem;
+  padding: 0;
+}
+
+.joke {
+  display: block;
+  background: #FF5722;
+  color: #FAFAFA;
+  margin: 1em;
+  padding: .25em;
+  border: 1px solid #FF5722;
+  border-radius: 4px;
+  box-shadow: 1px 1px 5px #FF5722;
+  overflow: auto;
+}
+
+.joke-text-container {
+  display: inline-block;
+  float: left;
+  margin-top: 0;
+  margin-left: 1em;
+  width: -moz-calc(100% - 4.5em);
+  width: -webkit-calc(100% - 4.5em);
+  width: calc(100% - 4.5em);
+}
+
+.joke-text {
+  display: inline-block;
+  margin-top: 0;
+  width: auto;
+}
+
+.star, .thumbUp, .thumbDown {
+  height: 1.5em;
+  width: 1.5em;
+  fill: #FAFAFA;
+}
+
+.thumb-container {
+  display: inline-block;
+  float: left;
+  width: 1.5em;
+}
+
+.thumbUp, .thumbDown {
+  height: 1.5em;
+  width: 1.5em;
+}
+
+.starred {
+  fill: #795548;
+}
+
+/*.favorite {
+  color: #795548;
+}*/
+
+.star {
+  display: inline-block;
+  float: right;
+}
