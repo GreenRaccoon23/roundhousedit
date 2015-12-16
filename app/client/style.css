@@ -5,7 +5,7 @@ html, body {
   width: 100%;
   font-family: Roboto;
   background: #E9E9E9;
-  color: #FAFAFA;
+  color: #EFEBE9;
   font-size: 16px;
   text-indent: 0;
   padding: 0;
@@ -80,7 +80,7 @@ html, body {
 .bar {
   display: block;
   background: #FF5722;
-  color: #FAFAFA;
+  color: #EFEBE9;
   padding: .25em;
   border: 1px solid #FF5722;
   border-radius: 4px;
@@ -116,7 +116,7 @@ html, body {
 .joke {
   display: block;
   background: #FF5722;
-  color: #FAFAFA;
+  color: #EFEBE9;
   margin: 1em;
   padding: .25em;
   border: 1px solid #FF5722;
@@ -139,12 +139,13 @@ html, body {
   display: inline-block;
   margin-top: 0;
   width: auto;
+  color: #FBE9E7;
 }
 
 .star, .thumbUp, .thumbDown {
   height: 1.5em;
   width: 1.5em;
-  fill: #FAFAFA;
+  fill: #FBE9E7;
 }
 
 .thumb-container {
@@ -158,13 +159,14 @@ html, body {
   width: 1.5em;
 }
 
-.starred, .voted-down, .voted-up, .favorite {
+.starred, .voted-down, .voted-up {
   fill: #795548;
 }
 
-/*.favorite {
-  color: #795548;
-}*/
+.favorite {
+  font-weight: bold;
+  color: #FFFFFF;
+}
 
 .star {
   display: inline-block;

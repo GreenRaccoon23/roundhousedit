@@ -26,18 +26,27 @@ var jokes = {
     window.categoryList = ['all'];
     window.jokeList = [];
     ctrl.category = window.category;
-    // ctrl.jokes = [];
     ctrl.jokes = [{
       categories: [],
-      id: 2,
-      joke: "MacGyver can build an airplane out of gum and paper clips. Chuck Norris can kill him and take it.",
-      votes: 2
-    },
-    {
+      id: 598,
+      joke: "Chuck Norris is the reason Waldo is hiding.",
+      votes: 3,
+      favorite: false,
+      vote: ''
+    }, {
       categories: [],
-      id: 2,
-      joke: "Second MacGyver can build an airplane out of gum and paper clips. Chuck Norris can kill him and take it.",
-      votes: 1
+      id: 599,
+      joke: "Chuck Norris can slam a revolving door.",
+      votes: 2,
+      favorite: false,
+      vote: ''
+    }, {
+      categories: [],
+      id: 600,
+      joke: "Chuck Norris can make a Happy Meal cry.",
+      votes: 1,
+      favorite: false,
+      vote: ''
     }]
 
     ctrl.fetchCategories = function() {
@@ -45,9 +54,7 @@ var jokes = {
         .then(function(response) {
           // console.log('response', response);
           ctrl.categories = response.value;
-          console.log('categoryList', window.categoryList);
           window.categoryList = window.categoryList.concat(response.value);
-          console.log('categoryList', window.categoryList);
         });
     };
 
@@ -80,7 +87,7 @@ var jokes = {
       response.value.forEach(function(joke) {
         var skip = window.filters.reduce(function(skip, re) {
           return (skip) ? skip : re.test(joke.joke);
-        }, false)
+        }, false);
         if (!skip) {
           joke.votes = joke.votes || 0;
           joke.favorite = joke.favorite || false;
@@ -89,34 +96,36 @@ var jokes = {
 
           ctrl.jokes.push(joke);
         }
-      })
+      });
       console.log('Filtered response');
       ctrl.sortJokes();
       window.jokeList = ctrl.jokes;
       console.log('Sorted response');
     };
 
-    ctrl.sortJokesOld = function() {
-      for (var i = 0, len = ctrl.jokes.length - 1; i < len; i++) {
-        var currJoke = ctrl.jokes[i];
-        var nextJoke = ctrl.jokes[i + 1];
-        if (nextJoke.votes > currJoke.votes) {
-          for (var p in currJoke) {
-            var currP = currJoke[p];
-            var nextP = nextJoke[p];
-            currJoke[p] = nextP;
-            nextJoke[p] = currP;
-          }
-          m.redraw('diff');
-        }
-      }
-      setTimeout(ctrl.sortJokes, 1);
-    };
+    // ctrl.sortJokesAlt = function() {
+    //   for (var i = 0, len = ctrl.jokes.length - 1; i < len; i++) {
+    //     var currJoke = ctrl.jokes[i];
+    //     var nextJoke = ctrl.jokes[i + 1];
+    //     if (nextJoke.votes > currJoke.votes) {
+    //       for (var p in currJoke) {
+    //         var currP = currJoke[p];
+    //         var nextP = nextJoke[p];
+    //         currJoke[p] = nextP;
+    //         nextJoke[p] = currP;
+    //       }
+    //       m.redraw('diff');
+    //     }
+    //   }
+    //   setTimeout(ctrl.sortJokesAlt, 1);
+    // };
 
     ctrl.sortJokes = function() {
-      for (var i = 0, len = ctrl.jokes.length - 1; i < len; i++) {
+      var i = 0, len = ctrl.jokes.length - 1;
+      while (i < len) {
         var currJoke = ctrl.jokes[i];
-        for (var j = i + 1; j < len; j++) {
+        var j = i + 1;
+        while (j < len) {
           var nextJoke = ctrl.jokes[j];
           if (nextJoke.votes > currJoke.votes) {
             for (var p in currJoke) {
@@ -127,7 +136,9 @@ var jokes = {
             }
             m.redraw('diff');
           }
+          j++;
         }
+        i++;
       }
       setTimeout(ctrl.sortJokes, 1);
     };
@@ -141,13 +152,15 @@ var jokes = {
           ctrl.fetchCategory(ctrl.category);
         }
       }
+      setTimeout(ctrl.watchCategory, 1);
     };
 
     ctrl.fetchCategories();
     ctrl.fetchTotal();
     ctrl.fetchAll();
 
-    ctrl.watchingCategory = setInterval(ctrl.watchCategory, 500);
+    ctrl.watchCategory();
+    // ctrl.watchingCategory = setInterval(ctrl.watchCategory, 500);
   },
   view: function(ctrl) {
     return m('#jokes-container',
@@ -155,7 +168,7 @@ var jokes = {
         window.jokeList.map(function(jokeObj) {
           var correctCategory = (jokeObj.categories.indexOf(window.category) !== -1);
           return (window.category === 'all' || correctCategory)
-            ? m.component(joke, { jokeObj: jokeObj })
+            ? m.component(joke, jokeObj)
             : ''
         })
       )
@@ -166,20 +179,19 @@ var jokes = {
 var joke = {
   controller: function(inherited) {
     var ctrl = this;
-    ctrl.jokeObj = inherited.jokeObj;
-    ctrl.favorite = m.prop(false);
+    ctrl.jokeObj = inherited;
   },
   view: function(ctrl) {
-    return m('.joke', {
-        class: ctrl.favorite() ? 'favorite' : ''
-      }, [
+    return m('.joke', [
         m('.thumb-container', [
           m.component(thumbUpIcon, ctrl.jokeObj),
           m.component(thumbDownIcon, ctrl.jokeObj),
           m('.joke-vote', ctrl.jokeObj.votes)
         ]),
         m('.joke-text-container', [
-          m('.joke-text', ctrl.jokeObj.joke)
+          m('.joke-text', {
+            class: (ctrl.jokeObj.favorite) ? 'favorite' : ''
+          }, ctrl.jokeObj.joke)
         ]),
         m.component(starIcon, ctrl.jokeObj)
       ]
@@ -196,7 +208,7 @@ var thumbUpIcon = {
     return m('.thumbUp', {
         class: (ctrl.jokeObj.vote === 'up') ? 'voted-up' : '',
         onclick: function(e) {
-          if (ctrl.jokeObj.vote !== '') {
+          if (ctrl.jokeObj.vote === 'up') {
             return;
           }
           ctrl.jokeObj.votes += 1;
@@ -220,7 +232,7 @@ var thumbDownIcon = {
     return m('.thumbDown', {
         class: (ctrl.jokeObj.vote === 'down') ? 'voted-down' : '',
         onclick: function(e) {
-          if (ctrl.jokeObj.vote !== '') {
+          if (ctrl.jokeObj.vote === 'down') {
             return;
           }
           ctrl.jokeObj.votes -= 1;
@@ -249,6 +261,7 @@ var starIcon = {
           } else {
             ctrl.jokeObj.favorite = true;
           }
+          m.redraw('diff');
         }
       }, m('svg[viewBox="0 0 24 24"]', [
           m('path', {
@@ -257,28 +270,6 @@ var starIcon = {
         ])
       );
   }
-}
-
-function sortJokes(ctrl) {
-  var sorted = [];
-  var added = {};
-
-  for (var i = 0, len = ctrl.jokes.length; i < len; i++) {
-    var jokeToAdd = ctrl.jokes.reduce(function(jokeToAdd, joke) {
-      if (added[jokeToAdd.joke]) {
-        return joke;
-      } else if (added[joke.joke]) {
-        return jokeToAdd;
-      }
-      return (joke.votes > jokeToAdd.votes)
-        ? joke
-        : jokeToAdd;
-    }, ctrl.jokes[0]);
-    added[jokeToAdd.joke] = true;
-    sorted.push(jokeToAdd);
-  }
-  ctrl.jokes = sorted;
-  return sorted;
 }
 
 var copyIcon = {
@@ -299,4 +290,4 @@ var copyIcon = {
   }
 }
 
-var filters = [/condom/, /virgin/, /testicles/]
+var filters = [/condom/, /virgin/, /testicle/, /sex/]
