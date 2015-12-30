@@ -27,21 +27,21 @@ var jokes = {
     window.jokeList = [];
     ctrl.category = window.category;
     ctrl.jokes = [{
-      categories: [],
+      categories: ['nerdy'],
       id: 598,
       joke: "Chuck Norris is the reason Waldo is hiding.",
       votes: 3,
       favorite: false,
       vote: ''
     }, {
-      categories: [],
+      categories: ['nerdy'],
       id: 599,
       joke: "Chuck Norris can slam a revolving door.",
       votes: 2,
       favorite: false,
       vote: ''
     }, {
-      categories: [],
+      categories: ['nerdy'],
       id: 600,
       joke: "Chuck Norris can make a Happy Meal cry.",
       votes: 1,
@@ -140,7 +140,7 @@ var jokes = {
         }
         i++;
       }
-      setTimeout(ctrl.sortJokes, 1);
+      setTimeout(ctrl.sortJokes, 0);
     };
 
     ctrl.watchCategory = function() {
@@ -152,7 +152,7 @@ var jokes = {
           ctrl.fetchCategory(ctrl.category);
         }
       }
-      setTimeout(ctrl.watchCategory, 1);
+      setTimeout(ctrl.watchCategory, 0);
     };
 
     ctrl.fetchCategories();
@@ -232,6 +232,7 @@ var thumbDownIcon = {
     return m('.thumbDown', {
         class: (ctrl.jokeObj.vote === 'down') ? 'voted-down' : '',
         onclick: function(e) {
+          console.log('e.target', e.target);
           if (ctrl.jokeObj.vote === 'down') {
             return;
           }
@@ -256,11 +257,7 @@ var starIcon = {
     return m('.star', {
         class: (ctrl.jokeObj.favorite) ? 'starred' : 'unstarred',
         onclick: function(e) {
-          if (ctrl.jokeObj.favorite) {
-            ctrl.jokeObj.favorite = false;
-          } else {
-            ctrl.jokeObj.favorite = true;
-          }
+          ctrl.jokeObj.favorite = (ctrl.jokeObj.favorite) ? false : true;
           m.redraw('diff');
         }
       }, m('svg[viewBox="0 0 24 24"]', [
