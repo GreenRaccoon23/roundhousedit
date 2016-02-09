@@ -41,6 +41,8 @@ func setRootDir() {
 	// fmt.Printf("baseDir: %q\n", baseDir)
 
 	switch baseDir {
+	case "MVP":
+		// rootDir = rootDir
 	case "server":
 		rootDir = filepath.Dir(rootDir)
 	default:
