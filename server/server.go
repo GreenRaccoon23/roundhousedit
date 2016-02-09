@@ -20,8 +20,13 @@ func main() {
 	setRootDir()
 
 	http.HandleFunc("/", clientHandler)
-	fmt.Println("Listening on port 4000")
-	http.ListenAndServe(":4000", nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4000"
+	}
+	fmt.Println("Listening on port ", port)
+	port = concat(":", port)
+	http.ListenAndServe(port, nil)
 }
 
 // Find out where this go file exists on the file system.
