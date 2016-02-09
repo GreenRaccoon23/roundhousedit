@@ -1,1 +1,1 @@
-web: cd app; ./heroku-serve
+web: ./heroku-serve
