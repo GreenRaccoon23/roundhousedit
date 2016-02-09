@@ -4,4 +4,4 @@ cd client;
 ! [ -d "bower_components" ] && bower install;
 
 cd ..;
-./serve;
+server/server;
