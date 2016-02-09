@@ -1,1 +1,1 @@
-web: ./heroku-serve
+web: app/heroku-serve
