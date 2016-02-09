@@ -26,28 +26,29 @@ var jokes = {
     window.categoryList = ['all'];
     window.jokeList = [];
     ctrl.category = window.category;
-    ctrl.jokes = [{
-      categories: ['nerdy'],
-      id: 598,
-      joke: "Chuck Norris is the reason Waldo is hiding.",
-      votes: 3,
-      favorite: false,
-      vote: ''
-    }, {
-      categories: ['nerdy'],
-      id: 599,
-      joke: "Chuck Norris can slam a revolving door.",
-      votes: 2,
-      favorite: false,
-      vote: ''
-    }, {
-      categories: ['nerdy'],
-      id: 600,
-      joke: "Chuck Norris can make a Happy Meal cry.",
-      votes: 1,
-      favorite: false,
-      vote: ''
-    }]
+    ctrl.jokes = [];
+    // ctrl.jokes = [{
+    //   categories: ['nerdy'],
+    //   id: 598,
+    //   joke: "Chuck Norris is the reason Waldo is hiding.",
+    //   votes: 3,
+    //   favorite: false,
+    //   vote: ''
+    // }, {
+    //   categories: ['nerdy'],
+    //   id: 599,
+    //   joke: "Chuck Norris can slam a revolving door.",
+    //   votes: 2,
+    //   favorite: false,
+    //   vote: ''
+    // }, {
+    //   categories: ['nerdy'],
+    //   id: 600,
+    //   joke: "Chuck Norris can make a Happy Meal cry.",
+    //   votes: 1,
+    //   favorite: false,
+    //   vote: ''
+    // }]
 
     ctrl.fetchCategories = function() {
       api.fetchCategories()
@@ -89,7 +90,8 @@ var jokes = {
           return (skip) ? skip : re.test(joke.joke);
         }, false);
         if (!skip) {
-          joke.votes = joke.votes || 0;
+          // joke.votes = joke.votes || 0;
+          joke.votes = m.prop(0);
           joke.favorite = joke.favorite || false;
           joke.vote = joke.vote || '';
           joke.joke = joke.joke.replace(/\&quot\;/g, '"');
@@ -99,6 +101,12 @@ var jokes = {
       });
       console.log('Filtered response');
       ctrl.sortJokes();
+      ctrl.jokes.sort(function(a, b) {
+        	if ((b.votes() - a.votes()) < 0) {
+        		console.log('a', a);
+        	}
+        	return b.votes() - a.votes();
+        })
       window.jokeList = ctrl.jokes;
       console.log('Sorted response');
     };
@@ -160,33 +168,106 @@ var jokes = {
     ctrl.fetchAll();
 
     ctrl.watchCategory();
+    ctrl.sorter = sortByVotes;
     // ctrl.watchingCategory = setInterval(ctrl.watchCategory, 500);
   },
   view: function(ctrl) {
+    // https://lhorie.github.io/mithril-blog/vanilla-table-sorting.html
     return m('#jokes-container',
-      m('#jokes',
-        window.jokeList.map(function(jokeObj) {
+      m('#jokes[data-sort-by=votes]', sorter(ctrl.jokes), [
+        ctrl.sorter(ctrl.jokes).map(function(jokeObj) {
           var correctCategory = (jokeObj.categories.indexOf(window.category) !== -1);
           return (window.category === 'all' || correctCategory)
             ? m.component(joke, jokeObj)
             : ''
         })
-      )
+      ])
     );
   }
 }
+
+function sortByVotes(jokes) {
+    var sorted = jokes.sort(function(a, b) {
+    // return jokes.sort(function(a, b) {
+      // m.redraw('all')
+      if ( b.votes() > a.votes() ) {
+        console.log('a\n  ', a);
+        console.log('  b\n    ', b);
+      }
+      return ( b.votes() > a.votes() ) ? 1 : ( b.votes() < a.votes() ) ? -1 : 0
+    });
+    jokes = sorted;
+    return sorted;
+}
+
+function sorter(list) {
+  return {
+    onclick: function(e) {
+      console.log('About to sort %s', e.target);
+
+      console.log('e.target.classList', e.target.classList);
+      var classes = e.target.classList;
+      var direction = classes[1];
+
+      if (direction === 'vote-down') {
+        sortByVotes(list);
+      } else if (direction === 'vote-up') {
+        sortByVotes(list);
+      } else {
+        console.log('What is this thing?\n', e.target);
+      }
+    }
+  }
+}
+
+// function sorts(list) {
+//   return {
+//     onclick: function(e) {
+//       var prop = e.target.getAttribute("data-sort-by")
+//       if (prop) {
+//         var first = list[0]
+//         list.sort(function(a, b) {
+//           return a[prop] > b[prop] ? 1 : a[prop] < b[prop] ? -1 : 0
+//         })
+//         if (first === list[0]) list.reverse()
+//       }
+//     }
+//   }
+// }
+
+// var MyCtrl = function() {
+//   this.list = [{name: "John", age: 32}, {name: "Mary", age: 25}, {name: "Bob", age: 47}]
+// }
+// var myView = function(ctrl) {
+//   return m("table", sorts(ctrl.list), [
+//     m("tr", [
+//       m("th[data-sort-by=name]", "Name"),
+//       m("th[data-sort-by=age]", "Age")
+//     ])
+//     ctrl.list.map(function(person) {
+//       return m("tr", [
+//         m("td", person.name),
+//         m("td", person.age)
+//       ])
+//     })
+//   ])
+// }
+
+// m.module(document.body, {controller: MyCtrl, view: myView})
 
 var joke = {
   controller: function(inherited) {
     var ctrl = this;
     ctrl.jokeObj = inherited;
+    // console.log('ctrl.jokeObj.votes', ctrl.jokeObj.votes);
+    // ctrl.jokeObj.votess = m.prop(ctrl.jokeObj.votes);
   },
   view: function(ctrl) {
     return m('.joke', [
         m('.thumb-container', [
           m.component(thumbUpIcon, ctrl.jokeObj),
           m.component(thumbDownIcon, ctrl.jokeObj),
-          m('.joke-vote', ctrl.jokeObj.votes)
+          m('.joke-vote', ctrl.jokeObj.votes() ? ctrl.jokeObj.votes() : 0)
         ]),
         m('.joke-text-container', [
           m('.joke-text', {
@@ -211,11 +292,12 @@ var thumbUpIcon = {
           if (ctrl.jokeObj.vote === 'up') {
             return;
           }
-          ctrl.jokeObj.votes += 1;
-          ctrl.jokeObj.vote = 'up';
+          // ctrl.jokeObj.votes += 1;
+          ctrl.jokeObj.votes( ctrl.jokeObj.votes() + 1 );
+          ctrl.jokeObj.vote = (ctrl.jokeObj.vote === 'down') ? '' : 'up';
         }
       }, m('svg[viewBox="0 0 48 48"]', [
-          m('path', {
+          m('path[class="voter vote-up"]', {
             d: 'M2 42h8V18H2v24zm44-22c0-2.21-1.79-4-4-4H29.37l1.91-9.14c.04-.2.07-.41.07-.63 0-.83-.34-1.58-.88-2.12L28.34 2 15.17 15.17C14.45 15.9 14 16.9 14 18v20c0 2.21 1.79 4 4 4h18c1.66 0 3.08-1.01 3.68-2.44l6.03-14.1c.18-.46.29-.95.29-1.46v-3.83l-.02-.02L46 20z'
           })
         ])
@@ -232,15 +314,16 @@ var thumbDownIcon = {
     return m('.thumbDown', {
         class: (ctrl.jokeObj.vote === 'down') ? 'voted-down' : '',
         onclick: function(e) {
-          console.log('e.target', e.target);
+          console.log('e.target', e.target.classList);
           if (ctrl.jokeObj.vote === 'down') {
             return;
           }
-          ctrl.jokeObj.votes -= 1;
-          ctrl.jokeObj.vote = 'down';
+          // ctrl.jokeObj.votes -= 1;
+          ctrl.jokeObj.votes( ctrl.jokeObj.votes() - 1 );
+          ctrl.jokeObj.vote = (ctrl.jokeObj.vote === 'up') ? '' : 'down';
         }
       }, m('svg[viewBox="0 0 48 48"]', [
-          m('path', {
+          m('path[data-sort-by="votes"][class="voter vote-down"]', {
             d: 'M30 6H12c-1.66 0-3.08 1.01-3.68 2.44l-6.03 14.1C2.11 23 2 23.49 2 24v3.83l.02.02L2 28c0 2.21 1.79 4 4 4h12.63l-1.91 9.14c-.04.2-.07.41-.07.63 0 .83.34 1.58.88 2.12L19.66 46l13.17-13.17C33.55 32.1 34 31.1 34 30V10c0-2.21-1.79-4-4-4zm8 0v24h8V6h-8z'
           })
         ])
