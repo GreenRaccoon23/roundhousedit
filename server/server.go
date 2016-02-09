@@ -42,7 +42,7 @@ func setRootDir() {
 
 	switch baseDir {
 	case "MVP":
-		// rootDir = rootDir
+		rootDir = ""
 	case "server":
 		rootDir = filepath.Dir(rootDir)
 	default:
