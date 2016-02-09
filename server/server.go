@@ -43,8 +43,6 @@ func setRootDir() {
 	switch baseDir {
 	case "server":
 		rootDir = filepath.Dir(rootDir)
-	case "app":
-		// rootDir = rootDir
 	default:
 		pwd, _ := os.Getwd()
 		rootDir = filepath.Dir(pwd)
