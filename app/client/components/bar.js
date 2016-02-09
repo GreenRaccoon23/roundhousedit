@@ -4,6 +4,7 @@ var bar = {
   },
   view: function(ctrl) {
     return m('#bar', [
+        m('h1[id="title"]', 'Roundhousedit'),
         m.component(menu)
       ]
     );
