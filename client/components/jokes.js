@@ -74,7 +74,7 @@ var jokes = {
 
     ctrl.filterResponse = function(response) {
       response.value.forEach(function(joke, i) {
-        if (i > 100) {
+        if (i > 200) {
           return;
         }
         var skip = window.filters.reduce(function(skip, re) {
