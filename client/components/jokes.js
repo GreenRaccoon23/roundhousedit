@@ -135,7 +135,7 @@ var jokes = {
     ctrl.fetchTotal();
     ctrl.fetchAll();
 
-    ctrl.watchCategory();
+    // ctrl.watchCategory();
     // ctrl.watchingCategory = setInterval(ctrl.watchCategory, 500);
   },
   view: function(ctrl) {
