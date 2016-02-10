@@ -109,7 +109,7 @@ var jokes = {
 
         i--;
       }
-      setTimeout(ctrl.sortJokes, 0);
+      setTimeout(ctrl.sortJokes, 100);
     };
 
     ctrl.watchCategory = function() {
@@ -121,7 +121,7 @@ var jokes = {
           ctrl.fetchCategory(ctrl.category);
         }
       }
-      setTimeout(ctrl.watchCategory, 0);
+      setTimeout(ctrl.watchCategory, 100);
     };
 
     ctrl.fetchCategories();
