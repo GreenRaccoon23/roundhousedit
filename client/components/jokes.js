@@ -73,11 +73,15 @@ var jokes = {
     };
 
     ctrl.filterResponse = function(response) {
-      response.value.forEach(function(joke) {
+      response.value.forEach(function(joke, i) {
+        if (i > 100) {
+          return;
+        }
         var skip = window.filters.reduce(function(skip, re) {
           return (skip) ? skip : re.test(joke.joke);
         }, false);
         if (!skip) {
+          joke.sortJokes = ctrl.sortJokes;
           joke.votes = joke.votes || 0;
           joke.favorite = joke.favorite || false;
           joke.vote = joke.vote || '';
@@ -105,11 +109,12 @@ var jokes = {
             prevJoke[p] = currP;
           }
           m.redraw('diff');
+          setTimeout(ctrl.sortJokes, 0);
         }
 
         i--;
       }
-      setTimeout(ctrl.sortJokes, 100);
+      // setTimeout(ctrl.sortJokes, 100);
     };
 
     ctrl.watchCategory = function() {
@@ -121,7 +126,7 @@ var jokes = {
           ctrl.fetchCategory(ctrl.category);
         }
       }
-      setTimeout(ctrl.watchCategory, 100);
+      setTimeout(ctrl.watchCategory, 0);
     };
 
     ctrl.fetchCategories();
@@ -182,6 +187,7 @@ var thumbUpIcon = {
           }
           ctrl.jokeObj.votes += 1;
           ctrl.jokeObj.vote = (ctrl.jokeObj.vote === 'down') ? '' : 'up';
+          ctrl.jokeObj.sortJokes();
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path[class="voter vote-up"]', {
@@ -206,6 +212,7 @@ var thumbDownIcon = {
           }
           ctrl.jokeObj.votes -= 1;
           ctrl.jokeObj.vote = (ctrl.jokeObj.vote === 'up') ? '' : 'down';
+          ctrl.jokeObj.sortJokes();
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path[class="voter vote-down"]', {
