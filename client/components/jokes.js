@@ -126,7 +126,7 @@ var jokes = {
           ctrl.fetchCategory(ctrl.category);
         }
       }
-      setTimeout(ctrl.watchCategory, 0);
+      setTimeout(ctrl.watchCategory, 100);
     };
 
     ctrl.fetchCategories();
