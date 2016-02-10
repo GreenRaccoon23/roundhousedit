@@ -74,21 +74,23 @@ var jokes = {
 
     ctrl.filterResponse = function(response) {
       response.value.forEach(function(joke, i) {
-        if (i > 200) {
+        console.log(i);
+        if ( (i > 100) && (joke.categories.indexOf('nerdy') === -1) ) {
           return;
         }
         var skip = window.filters.reduce(function(skip, re) {
           return (skip) ? skip : re.test(joke.joke);
         }, false);
-        if (!skip) {
-          joke.sortJokes = ctrl.sortJokes;
-          joke.votes = joke.votes || 0;
-          joke.favorite = joke.favorite || false;
-          joke.vote = joke.vote || '';
-          joke.joke = joke.joke.replace(/\&quot\;/g, '"');
-
-          ctrl.jokes.push(joke);
+        if (skip) {
+          return;
         }
+        joke.sortJokes = ctrl.sortJokes;
+        joke.votes = joke.votes || 0;
+        joke.favorite = joke.favorite || false;
+        joke.vote = joke.vote || '';
+        joke.joke = joke.joke.replace(/\&quot\;/g, '"');
+
+        ctrl.jokes.push(joke);
       });
       ctrl.sortJokes();
       window.jokeList = ctrl.jokes;
