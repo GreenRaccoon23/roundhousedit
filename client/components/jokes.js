@@ -17,7 +17,6 @@ var JokeWidgets = {
     var ctrl = this;
     window.category = 'all';
     window.categoryList = ['all'];
-    window.jokeList = [];
     ctrl.category = window.category;
     ctrl.jokes = [{
       categories: ['nerdy'],
@@ -74,7 +73,6 @@ var JokeWidgets = {
 
     ctrl.filterResponse = function(response) {
       response.value.forEach(function(joke, i) {
-        // console.log(i);
         if ( (i > 100) && (joke.categories.indexOf('nerdy') === -1) ) {
           return;
         }
@@ -92,31 +90,7 @@ var JokeWidgets = {
 
         ctrl.jokes.push(joke);
       });
-      ctrl.sortJokes();
       window.jokeList = ctrl.jokes;
-    };
-
-    ctrl.sortJokes = function() {
-      var i = ctrl.jokes.length - 1;
-      while (i > 0) {
-        var j = i - 1;
-        var currJoke = ctrl.jokes[i];
-        var prevJoke = ctrl.jokes[j];
-
-        if (prevJoke.votes < currJoke.votes) {
-          for (var p in currJoke) {
-            var currP = currJoke[p];
-            var nextP = prevJoke[p];
-            currJoke[p] = nextP;
-            prevJoke[p] = currP;
-          }
-          m.redraw('diff');
-          setTimeout(ctrl.sortJokes, 0);
-        }
-
-        i--;
-      }
-      // setTimeout(ctrl.sortJokes, 100);
     };
 
     ctrl.watchCategory = function() {
@@ -186,7 +160,6 @@ var thumbUpIcon = {
           }
           joke.votes += 1;
           joke.vote = (joke.vote === 'down') ? '' : 'up';
-          // joke.sortJokes();
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path[class="voter vote-up"]', {
@@ -207,7 +180,6 @@ var thumbDownIcon = {
           }
           joke.votes -= 1;
           joke.vote = (joke.vote === 'up') ? '' : 'down';
-          // joke.sortJokes();
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path[class="voter vote-down"]', {
