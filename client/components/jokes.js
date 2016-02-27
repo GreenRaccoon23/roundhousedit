@@ -134,7 +134,7 @@ var JokeWidgets = {
 var JokeWidget = {
   view: function(ctrl, joke) {
     return m('.joke', [
-        m('.thumb-container', [
+        m('.joke-vote-container', [
           m.component(ThumbUpIcon, joke),
           m.component(ThumbDownIcon, joke),
           m('.joke-vote-count', joke.votes)
