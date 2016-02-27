@@ -12,7 +12,7 @@ Array.prototype.matches = function(other) {
   return true;
 }
 
-var jokes = {
+var JokeWidgets = {
   controller: function() {
     var ctrl = this;
     window.category = 'all';
@@ -74,7 +74,7 @@ var jokes = {
 
     ctrl.filterResponse = function(response) {
       response.value.forEach(function(joke, i) {
-        console.log(i);
+        // console.log(i);
         if ( (i > 100) && (joke.categories.indexOf('nerdy') === -1) ) {
           return;
         }
@@ -141,55 +141,52 @@ var jokes = {
   view: function(ctrl) {
     return m('#jokes-container',
       m('#jokes',
-        window.jokeList.map(function(jokeObj) {
-          var correctCategory = (jokeObj.categories.indexOf(window.category) !== -1);
-          return (window.category === 'all' || correctCategory)
-            ? m.component(joke, jokeObj)
-            : ''
+        ctrl.jokes.sort(function(a, b) {
+          return (a.votes < b.votes) ? 1 : -1;
+        }).map(function(joke) {
+          var isCorrectCategory = (
+            (window.category === 'all') || 
+            (jokeObj.categories.indexOf(window.category) !== -1)
+          );
+          return ( ! isCorrectCategory )
+            ? ''
+            : m.component(JokeWidget, joke);
         })
       )
     );
   }
 }
 
-var joke = {
-  controller: function(inherited) {
-    var ctrl = this;
-    ctrl.jokeObj = inherited;
-  },
-  view: function(ctrl) {
+var JokeWidget = {
+  view: function(ctrl, joke) {
     return m('.joke', [
         m('.thumb-container', [
-          m.component(thumbUpIcon, ctrl.jokeObj),
-          m.component(thumbDownIcon, ctrl.jokeObj),
-          m('.joke-vote', ctrl.jokeObj.votes)
+          m.component(thumbUpIcon, joke),
+          m.component(thumbDownIcon, joke),
+          m('.joke-vote', joke.votes)
         ]),
         m('.joke-text-container', [
           m('.joke-text', {
-            class: (ctrl.jokeObj.favorite) ? 'favorite' : ''
-          }, ctrl.jokeObj.joke)
+            class: (joke.favorite) ? 'favorite' : ''
+          }, joke.joke)
         ]),
-        m.component(starIcon, ctrl.jokeObj)
+        m.component(starIcon, joke)
       ]
     );
   }
 }
 
 var thumbUpIcon = {
-  controller: function(inherited) {
-    var ctrl = this;
-    ctrl.jokeObj = inherited;
-  },
-  view: function(ctrl) {
+  view: function(ctrl, joke) {
     return m('.thumbUp', {
-        class: (ctrl.jokeObj.vote === 'up') ? 'voted-up' : '',
+        class: (joke.vote === 'up') ? 'voted-up' : '',
         onclick: function(e) {
-          if (ctrl.jokeObj.vote === 'up') {
+          if (joke.vote === 'up') {
             return;
           }
-          ctrl.jokeObj.votes += 1;
-          ctrl.jokeObj.vote = (ctrl.jokeObj.vote === 'down') ? '' : 'up';
-          ctrl.jokeObj.sortJokes();
+          joke.votes += 1;
+          joke.vote = (joke.vote === 'down') ? '' : 'up';
+          // joke.sortJokes();
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path[class="voter vote-up"]', {
@@ -201,20 +198,16 @@ var thumbUpIcon = {
 }
 
 var thumbDownIcon = {
-  controller: function(inherited) {
-    var ctrl = this;
-    ctrl.jokeObj = inherited;
-  },
-  view: function(ctrl) {
+  view: function(ctrl, joke) {
     return m('.thumbDown', {
-        class: (ctrl.jokeObj.vote === 'down') ? 'voted-down' : '',
+        class: (joke.vote === 'down') ? 'voted-down' : '',
         onclick: function(e) {
-          if (ctrl.jokeObj.vote === 'down') {
+          if (joke.vote === 'down') {
             return;
           }
-          ctrl.jokeObj.votes -= 1;
-          ctrl.jokeObj.vote = (ctrl.jokeObj.vote === 'up') ? '' : 'down';
-          ctrl.jokeObj.sortJokes();
+          joke.votes -= 1;
+          joke.vote = (joke.vote === 'up') ? '' : 'down';
+          // joke.sortJokes();
         }
       }, m('svg[viewBox="0 0 48 48"]', [
           m('path[class="voter vote-down"]', {
@@ -226,15 +219,11 @@ var thumbDownIcon = {
 }
 
 var starIcon = {
-  controller: function(inherited) {
-    var ctrl = this;
-    ctrl.jokeObj = inherited;
-  },
-  view: function(ctrl) {
+  view: function(ctrl, joke) {
     return m('.star', {
-        class: (ctrl.jokeObj.favorite) ? 'starred' : 'unstarred',
+        class: (joke.favorite) ? 'starred' : 'unstarred',
         onclick: function(e) {
-          ctrl.jokeObj.favorite = (ctrl.jokeObj.favorite) ? false : true;
+          joke.favorite = (joke.favorite) ? false : true;
           m.redraw('diff');
         }
       }, m('svg[viewBox="0 0 24 24"]', [
@@ -247,9 +236,6 @@ var starIcon = {
 }
 
 var copyIcon = {
-  controller: function() {
-    var ctrl = this;
-  },
   view: function(ctrl) {
     return m('.copy', {
         onclick: function(e) {
