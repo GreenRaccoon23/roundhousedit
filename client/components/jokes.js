@@ -116,7 +116,7 @@ var JokeWidgets = {
     return m('#jokes-container',
       m('#jokes',
         ctrl.jokes.sort(function(a, b) {
-          return (a.votes < b.votes) ? 1 : -1;
+          return (a.votes < b.votes) ? 1 : (a.votes > b.votes) ? -1 : 0;
         }).map(function(joke) {
           var isCorrectCategory = (
             (window.category === 'all') || 
