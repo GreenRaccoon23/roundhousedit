@@ -150,7 +150,7 @@ html, body {
   color: #FBE9E7;
 }
 
-.star, .thumbUp, .thumbDown {
+.star, .thumb-up, .thumb-down {
   height: 1.5em;
   width: 1.5em;
   fill: #FBE9E7;
@@ -162,7 +162,7 @@ html, body {
   width: 1.5em;
 }
 
-.thumbUp, .thumbDown {
+.thumb-up, .thumb-down {
   height: 1.5em;
   width: 1.5em;
 }
@@ -181,7 +181,7 @@ html, body {
   float: right;
 }
 
-.thumbUp:hover, .thumbDown:hover, .star:hover, .starred:hover {
+.thumb-up:hover, .thumb-down:hover, .star:hover, .starred:hover {
   cursor: pointer;
   fill: rgba(121, 85, 72, .54);
 }

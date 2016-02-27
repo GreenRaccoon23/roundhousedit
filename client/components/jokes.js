@@ -152,7 +152,7 @@ var JokeWidget = {
 
 var ThumbUpIcon = {
   view: function(ctrl, joke) {
-    return m('.thumbUp', {
+    return m('.thumb-up', {
         class: (joke.vote === 'up') ? 'voted-up' : '',
         onclick: function(e) {
           if (joke.vote === 'up') {
@@ -172,7 +172,7 @@ var ThumbUpIcon = {
 
 var ThumbDownIcon = {
   view: function(ctrl, joke) {
-    return m('.thumbDown', {
+    return m('.thumb-down', {
         class: (joke.vote === 'down') ? 'voted-down' : '',
         onclick: function(e) {
           if (joke.vote === 'down') {
