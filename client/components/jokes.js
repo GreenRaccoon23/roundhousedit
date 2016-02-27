@@ -135,8 +135,8 @@ var JokeWidget = {
   view: function(ctrl, joke) {
     return m('.joke', [
         m('.thumb-container', [
-          m.component(thumbUpIcon, joke),
-          m.component(thumbDownIcon, joke),
+          m.component(ThumbUpIcon, joke),
+          m.component(ThumbDownIcon, joke),
           m('.joke-vote', joke.votes)
         ]),
         m('.joke-text-container', [
@@ -144,13 +144,13 @@ var JokeWidget = {
             class: (joke.favorite) ? 'favorite' : ''
           }, joke.joke)
         ]),
-        m.component(starIcon, joke)
+        m.component(StarIcon, joke)
       ]
     );
   }
 }
 
-var thumbUpIcon = {
+var ThumbUpIcon = {
   view: function(ctrl, joke) {
     return m('.thumbUp', {
         class: (joke.vote === 'up') ? 'voted-up' : '',
@@ -170,7 +170,7 @@ var thumbUpIcon = {
   }
 }
 
-var thumbDownIcon = {
+var ThumbDownIcon = {
   view: function(ctrl, joke) {
     return m('.thumbDown', {
         class: (joke.vote === 'down') ? 'voted-down' : '',
@@ -190,7 +190,7 @@ var thumbDownIcon = {
   }
 }
 
-var starIcon = {
+var StarIcon = {
   view: function(ctrl, joke) {
     return m('.star', {
         class: (joke.favorite) ? 'starred' : 'unstarred',
@@ -201,21 +201,6 @@ var starIcon = {
       }, m('svg[viewBox="0 0 24 24"]', [
           m('path', {
             d: 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'
-          })
-        ])
-      );
-  }
-}
-
-var copyIcon = {
-  view: function(ctrl) {
-    return m('.copy', {
-        onclick: function(e) {
-          ctrl.favorite(false);
-        }
-      }, m('svg[viewBox="0 0 48 48"]', [
-          m('path', {
-            d: 'M32 2H8C5.79 2 4 3.79 4 6v28h4V6h24V2zm6 8H16c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h22c2.21 0 4-1.79 4-4V14c0-2.21-1.79-4-4-4zm0 32H16V14h22v28z'
           })
         ])
       );
