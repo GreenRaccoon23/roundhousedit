@@ -137,7 +137,7 @@ var JokeWidget = {
         m('.thumb-container', [
           m.component(ThumbUpIcon, joke),
           m.component(ThumbDownIcon, joke),
-          m('.joke-vote', joke.votes)
+          m('.joke-vote-count', joke.votes)
         ]),
         m('.joke-text-container', [
           m('.joke-text', {
