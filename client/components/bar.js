@@ -58,43 +58,42 @@ function collapsedCategories() {
 
 // https://www.snip2code.com/Snippet/532936/How-to-capture--hover-intent--with-Mithr
 var Hoverable = {
-  controller : function( args ){
-    var timer
+  controller: function(args){
+    var ctrl = this;
+    args.delay = (args.delay === undefined) ? 100 : args.delay;
+
+    var timer;
     
-    this.mouseover = function(){
-      m.redraw.strategy( 'none' )
-      
-      clearTimeout( timer )
-      
-      timer = setTimeout( function(){
-        args.hover( true )
-        
-        m.redraw.strategy( 'diff' )
-        
-        m.redraw()
-      }, args.delay || 100 )
-    }
-    
-    this.mouseout = function(){
-      m.redraw.strategy( 'none' )
-      
-      clearTimeout( timer )
-      
-      timer = setTimeout( function(){
-        args.hover( false )
-        
-        m.redraw.strategy( 'diff' )
-        
-        m.redraw()
-      }, args.delay || 100 )
-    }
+    ctrl.mouseover = function(){
+      m.redraw.strategy('none');
+      clearTimeout(timer);
+
+      ctrl.timer = setTimeout(function(){
+        args.hover(true);
+
+        m.redraw.strategy('diff');
+        m.redraw();
+      }, args.delay);
+    };
+
+    ctrl.mouseout = function(){
+      m.redraw.strategy('none');
+      clearTimeout(timer);
+
+      ctrl.timer = setTimeout(function(){
+        args.hover(false);
+
+        m.redraw.strategy('diff');
+        m.redraw();
+      }, args.delay);
+    };
   },
-  view : function( ctrl, args, contents ){
-    return m( '.hoverable', {
-      onmouseover : ctrl.mouseover,
-      onmouseout  : ctrl.mouseout
-    }, 
-      [].slice.call( arguments, 2 )
-    )
+  view: function(ctrl, args, contents) {
+    return m('.hoverable', {
+        onmouseover : ctrl.mouseover,
+        onmouseout  : ctrl.mouseout
+      }, 
+      [].slice.call(arguments, 2)
+    );
   }
 }
