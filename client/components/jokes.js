@@ -43,46 +43,44 @@ var JokeWidgetSeries = {
 
     ctrl.fetchCategories = function() {
       api.fetchCategories()
-        .then(function(response) {
-          ctrl.categories = response.value;
-          window.categoryList = window.categoryList.concat(response.value);
+        .then(function(res) {
+          ctrl.categories = res.value;
+          window.categoryList = window.categoryList.concat(res.value);
         });
     };
 
     ctrl.fetchTotal = function() {
       api.fetchTotal()
-        .then(function(response) {
-          ctrl.total = response.value;
+        .then(function(res) {
+          ctrl.total = res.value;
         });
     };
 
     ctrl.fetchAll = function() {
+      var now = performance.now();
       api.fetchAll()
-        .then(function(response) {
-          console.log('Received jokes from API');
-          ctrl.filterResponse(response);
+        .then(function(res) {
+          console.log('Received all', res.value.length, 'jokes from API');
+          ctrl.filterResponse(res);
         });
     };
 
-    ctrl.fetchCategory = function() {
-      api.fetchCategory(ctrl.category)
-        .then(function(response) {
-          ctrl.filterResponse(response);
+    ctrl.fetchCategory = function(category) {
+      api.fetchCategory(category)
+        .then(function(res) {
+          console.log('Received', res.value.length, category, 'jokes from API');
+          ctrl.filterResponse(res);
         });
     };
 
-    ctrl.filterResponse = function(response) {
-      response.value.forEach(function(joke, i) {
-        if ( (i > 100) && (joke.categories.indexOf('nerdy') === -1) ) {
-          return;
-        }
+    ctrl.filterResponse = function(res) {
+      res.value.forEach(function(joke, i) {
         var skip = window.filters.reduce(function(skip, re) {
           return (skip) ? skip : re.test(joke.joke);
         }, false);
         if (skip) {
           return;
         }
-        joke.sortJokes = ctrl.sortJokes;
         joke.votes = joke.votes || 0;
         joke.favorite = joke.favorite || false;
         joke.vote = joke.vote || '';
@@ -90,13 +88,12 @@ var JokeWidgetSeries = {
 
         ctrl.jokes.push(joke);
       });
-      window.jokeList = ctrl.jokes;
     };
 
     ctrl.watchCategory = function() {
       if (window.category !== ctrl.category) {
         ctrl.category = window.category;
-        if (ctrl.category !== 'all') {
+        if (ctrl.category === 'all') {
           ctrl.fetchAll();
         } else {
           ctrl.fetchCategory(ctrl.category);
