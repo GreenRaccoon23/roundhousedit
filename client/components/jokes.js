@@ -120,7 +120,7 @@ var JokeWidgetSeries = {
         }).map(function(joke) {
           var isCorrectCategory = (
             (window.category === 'all') || 
-            (jokeObj.categories.indexOf(window.category) !== -1)
+            (joke.categories.indexOf(window.category) !== -1)
           );
           return ( ! isCorrectCategory )
             ? ''
