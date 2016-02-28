@@ -12,7 +12,7 @@ Array.prototype.matches = function(other) {
   return true;
 }
 
-var JokeWidgets = {
+var JokeWidgetSeries = {
   controller: function() {
     var ctrl = this;
     window.category = 'all';
