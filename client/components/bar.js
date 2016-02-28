@@ -21,7 +21,6 @@ var Menu = {
         m.component(Hoverable, {
           hover: ctrl.showMenu,
           delay: 100
-        // }, menuElements(ctrl)
         }, [m.component(CategoryList, { showMenu: ctrl.showMenu })]
       )
     )
