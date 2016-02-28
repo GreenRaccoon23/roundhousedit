@@ -1,34 +1,34 @@
-var bar = {
+var Bar = {
   controller: function() {
     var ctrl = this;
   },
   view: function(ctrl) {
     return m('#bar', [
         m('h1[id="title"]', 'Roundhousedit'),
-        m.component(menu)
+        m.component(Menu)
       ]
     );
   }
 }
 
-var menu = {
+var Menu = {
   controller: function() {
     var ctrl = this;
     ctrl.showMenu = m.prop(false);
   },
   view: function(ctrl) {
     return m('#menu',
-        m.component(hoverable, {
+        m.component(Hoverable, {
           hover: ctrl.showMenu,
           delay: 100
         // }, menuElements(ctrl)
-        }, [m.component(categories, { showMenu: ctrl.showMenu })]
+        }, [m.component(CategoryList, { showMenu: ctrl.showMenu })]
       )
     )
   }
 }
 
-var categories = {
+var CategoryList = {
   controller: function(inherited) {
     var ctrl = this;
     ctrl.showMenu = inherited.showMenu;
@@ -57,17 +57,8 @@ function collapsedCategories() {
   return m('#categories', 'Categories', []);
 }
 
-// function menuElements(ctrl) {
-//   return (!ctrl.showMenu())
-//     ? m('.menu', 'Menu')
-//     : [
-//         m('.menu', 'Menu'),
-//         m('.menu', 'hi')
-//     ];
-// }
-
 // https://www.snip2code.com/Snippet/532936/How-to-capture--hover-intent--with-Mithr
-var hoverable = {
+var Hoverable = {
   controller : function( args ){
     var timer
     
