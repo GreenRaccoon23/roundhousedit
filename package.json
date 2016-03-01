@@ -1,0 +1,22 @@
+{
+  "name": "roundhousedit",
+  "version": "1.0.0",
+  "description": "Mithril.js meets Chuck Norris",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GreenRaccoon23/roundhousedit.git"
+  },
+  "author": "GreenRaccoon23 <GreenRaccoon23@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "bower": "^1.7.2",
+    "express": "^4.13.3",
+    "express-partials": "^0.3.0"
+  }
+}
