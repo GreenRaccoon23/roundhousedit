@@ -3,6 +3,11 @@
 ### Download:
 
     git clone https://github.com/GreenRaccoon23/roundhousedit.git
+    bower install
+    npm install
+    server/server
+    # OR
+    node main.js
 
 ### Description:
 
